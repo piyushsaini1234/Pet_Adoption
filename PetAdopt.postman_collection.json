@@ -1,0 +1,784 @@
+{
+  "info": {
+    "name": "PetAdopt API",
+    "description": "REST API for the Pet Adoption Management System.\n\n**Base URL:** `http://localhost:5000/api`\n\n**How to use:**\n1. Import this collection\n2. Import `PetAdopt.postman_environment.json` as the environment\n3. Select **PetAdopt — LOCAL** from the environment dropdown (top right)\n4. Hit **Login** first — the token saves automatically\n5. All protected requests will work from there\n\n**Roles:**\n- `user` — browse pets, apply for adoption, view own applications\n- `admin` — everything above + manage pets & adoption requests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "petId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adoptionId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Register, login, and get current user. No token needed for register and login.",
+      "item": [
+        {
+          "name": "Register — User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ravi Sharma\",\n  \"email\": \"ravi@example.com\",\n  \"password\": \"ravi1234\",\n  \"role\": \"user\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Creates a new user account. Returns a JWT `token` on success.\n\n`role` can be `user` or `admin`."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "register"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ravi Sharma\",\n  \"email\": \"ravi@example.com\",\n  \"password\": \"ravi1234\",\n  \"role\": \"user\"\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YjFmMmEzYzllNzdiMDAxYTJmM2UxMCIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxNzAwNjA0ODAwfQ.abc123\",\n  \"user\": {\n    \"_id\": \"64b1f2a3c9e77b001a2f3e10\",\n    \"name\": \"Ravi Sharma\",\n    \"email\": \"ravi@example.com\",\n    \"role\": \"user\"\n  }\n}"
+            },
+            {
+              "name": "400 Email Already Used",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "register"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ravi Sharma\",\n  \"email\": \"ravi@example.com\",\n  \"password\": \"ravi1234\",\n  \"role\": \"user\"\n}"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"Email is already in use\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register — Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Priya Admin\",\n  \"email\": \"admin@petadopt.com\",\n  \"password\": \"admin1234\",\n  \"role\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Same endpoint — just pass `\"role\": \"admin\"` to create a shelter staff account."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "register"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Priya Admin\",\n  \"email\": \"admin@petadopt.com\",\n  \"password\": \"admin1234\",\n  \"role\": \"admin\"\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"user\": {\n    \"_id\": \"64b1f2a3c9e77b001a2f3e99\",\n    \"name\": \"Priya Admin\",\n    \"email\": \"admin@petadopt.com\",\n    \"role\": \"admin\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "    pm.environment.set('token', json.token);",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "    console.log('✅ Token saved successfully');",
+                  "} else {",
+                  "    console.warn('⚠️ No token in response');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ravi@example.com\",\n  \"password\": \"ravi1234\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Authenticates a user and returns a JWT token.\n\nThe **Tests** script on this request automatically saves the token to the environment variable `token` — you don't need to copy-paste it."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "login"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"ravi@example.com\",\n  \"password\": \"ravi1234\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YjFmMmEzYzllNzdiMDAxYTJmM2UxMCIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxNzAwNjA0ODAwfQ.abc123\",\n  \"user\": {\n    \"_id\": \"64b1f2a3c9e77b001a2f3e10\",\n    \"name\": \"Ravi Sharma\",\n    \"email\": \"ravi@example.com\",\n    \"role\": \"user\"\n  }\n}"
+            },
+            {
+              "name": "401 Wrong Credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "login"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"ravi@example.com\",\n  \"password\": \"wrongpass\"\n}"
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"Invalid credentials\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Current User (me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Returns the profile of the currently logged-in user.\n\nRequires a valid `Authorization: Bearer <token>` header."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "me"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"_id\": \"64b1f2a3c9e77b001a2f3e10\",\n  \"name\": \"Ravi Sharma\",\n  \"email\": \"ravi@example.com\",\n  \"role\": \"user\",\n  \"createdAt\": \"2026-03-17T10:00:00.000Z\",\n  \"updatedAt\": \"2026-03-17T10:00:00.000Z\"\n}"
+            },
+            {
+              "name": "401 No Token",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/me",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "me"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"Not authorized, no token provided\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pets",
+      "description": "Pet CRUD.\n\n- `GET` routes are **public** — no token needed\n- `POST`, `PUT`, `DELETE` are **admin only**",
+      "item": [
+        {
+          "name": "Get All Pets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets?status=available&page=1&limit=9",
+              "host": ["{{baseUrl}}"],
+              "path": ["pets"],
+              "query": [
+                { "key": "search",  "value": "",          "description": "Full-text search (name, breed, description)", "disabled": true },
+                { "key": "species", "value": "dog",       "description": "dog | cat | bird | rabbit | other", "disabled": true },
+                { "key": "breed",   "value": "labrador",  "description": "Partial match, case-insensitive", "disabled": true },
+                { "key": "minAge",  "value": "1",         "description": "Min age in years", "disabled": true },
+                { "key": "maxAge",  "value": "5",         "description": "Max age in years", "disabled": true },
+                { "key": "status",  "value": "available", "description": "available | pending | adopted" },
+                { "key": "page",    "value": "1" },
+                { "key": "limit",   "value": "9" }
+              ]
+            },
+            "description": "Returns paginated pets. All query params are optional — enable the disabled ones to try filtering.\n\n**Response:**\n```json\n{\n  \"pets\": [...],\n  \"pagination\": { \"total\": 24, \"page\": 1, \"pages\": 3, \"limit\": 9 }\n}\n```"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/pets?status=available&page=1&limit=9",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["pets"],
+                  "query": [
+                    { "key": "status", "value": "available" },
+                    { "key": "page",   "value": "1" },
+                    { "key": "limit",  "value": "9" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"pets\": [\n    {\n      \"_id\": \"64b2a1c3d9e77b001a2f4e20\",\n      \"name\": \"Bruno\",\n      \"species\": \"dog\",\n      \"breed\": \"Labrador\",\n      \"age\": 3,\n      \"description\": \"Friendly and loves kids.\",\n      \"image\": \"https://example.com/bruno.jpg\",\n      \"status\": \"available\",\n      \"createdAt\": \"2026-03-15T08:30:00.000Z\"\n    }\n  ],\n  \"pagination\": {\n    \"total\": 1,\n    \"page\": 1,\n    \"pages\": 1,\n    \"limit\": 9\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Pets — with Search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets?search=friendly&species=dog",
+              "host": ["{{baseUrl}}"],
+              "path": ["pets"],
+              "query": [
+                { "key": "search",  "value": "friendly" },
+                { "key": "species", "value": "dog" }
+              ]
+            },
+            "description": "Full-text search example. The `search` param matches against name, breed, and description fields."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Pet",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pets", "{{petId}}"]
+            },
+            "description": "Fetch full details for a pet by its `_id`.\n\nFirst run **Get All Pets**, copy an `_id` from the response, and set it as `petId` in the environment."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/pets/{{petId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["pets", "{{petId}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"_id\": \"64b2a1c3d9e77b001a2f4e20\",\n  \"name\": \"Bruno\",\n  \"species\": \"dog\",\n  \"breed\": \"Labrador\",\n  \"age\": 3,\n  \"description\": \"Friendly and loves kids.\",\n  \"image\": \"https://example.com/bruno.jpg\",\n  \"status\": \"available\",\n  \"createdAt\": \"2026-03-15T08:30:00.000Z\",\n  \"updatedAt\": \"2026-03-15T08:30:00.000Z\"\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/pets/invalid_id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["pets", "invalid_id"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"Pet not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add New Pet  [Admin]",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets",
+              "host": ["{{baseUrl}}"],
+              "path": ["pets"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Max\",\n  \"species\": \"dog\",\n  \"breed\": \"German Shepherd\",\n  \"age\": 2,\n  \"description\": \"Very energetic, loves outdoor activities. Good with other dogs.\",\n  \"image\": \"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Collage_of_Nine_Dogs.jpg/800px-Collage_of_Nine_Dogs.jpg\",\n  \"status\": \"available\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Creates a new pet listing. **Admin token required.**\n\n| Field | Type | Required |\n|---|---|---|\n| name | string | ✅ |\n| species | string | ✅ — `dog` \\| `cat` \\| `bird` \\| `rabbit` \\| `other` |\n| age | number | ✅ — in years |\n| breed | string | ❌ — defaults to `Unknown` |\n| description | string | ❌ |\n| image | string | ❌ — image URL |\n| status | string | ❌ — defaults to `available` |"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/pets",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["pets"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Max\",\n  \"species\": \"dog\",\n  \"breed\": \"German Shepherd\",\n  \"age\": 2\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"_id\": \"64b3c2d4e9f88c002b3g5f31\",\n  \"name\": \"Max\",\n  \"species\": \"dog\",\n  \"breed\": \"German Shepherd\",\n  \"age\": 2,\n  \"description\": \"Very energetic, loves outdoor activities.\",\n  \"image\": \"https://example.com/max.jpg\",\n  \"status\": \"available\",\n  \"createdAt\": \"2026-03-17T12:00:00.000Z\"\n}"
+            },
+            {
+              "name": "403 Not Admin",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/pets",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["pets"]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"You do not have permission to perform this action\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Pet  [Admin]",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pets", "{{petId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 4,\n  \"description\": \"Updated: now fully vaccinated and neutered.\",\n  \"status\": \"available\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Partially update a pet. Only send fields you want to change. **Admin token required.**"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/pets/{{petId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["pets", "{{petId}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"age\": 4,\n  \"description\": \"Updated.\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"_id\": \"64b2a1c3d9e77b001a2f4e20\",\n  \"name\": \"Max\",\n  \"species\": \"dog\",\n  \"breed\": \"German Shepherd\",\n  \"age\": 4,\n  \"description\": \"Updated: now fully vaccinated and neutered.\",\n  \"status\": \"available\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Pet  [Admin]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pets/{{petId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pets", "{{petId}}"]
+            },
+            "description": "Permanently removes a pet. **Admin token required.** This cannot be undone."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/pets/{{petId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["pets", "{{petId}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"Pet removed successfully\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Adoptions",
+      "description": "Adoption request workflow:\n\n1. **User** applies → `POST /adoption/:petId`\n2. **Admin** views all → `GET /adoption/admin`\n3. **Admin** approves/rejects → `PUT /adoption/:id`\n4. **User** checks status → `GET /adoption`\n\n> Approving a request auto-sets pet status to `adopted` and rejects all other pending requests for that pet.",
+      "item": [
+        {
+          "name": "Apply for Adoption  [User]",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/adoption/{{petId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["adoption", "{{petId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"I have a large yard and 5 years of experience with dogs. Bruno would have a wonderful home with me.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Submits an adoption application. **User token required.**\n\n- `message` is optional\n- Returns `400` if already applied or pet is already adopted\n- Sets pet status to `pending` on success"
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/adoption/{{petId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["adoption", "{{petId}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"message\": \"I have a large yard...\"\n}"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"_id\": \"64b4d3e5f0a99d003c4h6g42\",\n  \"user\": {\n    \"_id\": \"64b1f2a3c9e77b001a2f3e10\",\n    \"name\": \"Ravi Sharma\",\n    \"email\": \"ravi@example.com\"\n  },\n  \"pet\": {\n    \"_id\": \"64b2a1c3d9e77b001a2f4e20\",\n    \"name\": \"Bruno\",\n    \"species\": \"dog\",\n    \"status\": \"pending\"\n  },\n  \"status\": \"pending\",\n  \"message\": \"I have a large yard...\",\n  \"createdAt\": \"2026-03-17T14:00:00.000Z\"\n}"
+            },
+            {
+              "name": "400 Already Applied",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/adoption/{{petId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["adoption", "{{petId}}"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"You have already applied for this pet\"\n}"
+            },
+            {
+              "name": "400 Pet Already Adopted",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/adoption/{{petId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["adoption", "{{petId}}"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"This pet has already been adopted\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "My Applications  [User]",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/adoption",
+              "host": ["{{baseUrl}}"],
+              "path": ["adoption"]
+            },
+            "description": "Returns all adoption requests of the currently logged-in user, sorted newest first. **User token required.**"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/adoption",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["adoption"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"_id\": \"64b4d3e5f0a99d003c4h6g42\",\n    \"pet\": {\n      \"_id\": \"64b2a1c3d9e77b001a2f4e20\",\n      \"name\": \"Bruno\",\n      \"species\": \"dog\",\n      \"breed\": \"Labrador\",\n      \"status\": \"pending\"\n    },\n    \"status\": \"pending\",\n    \"message\": \"I have a large yard...\",\n    \"createdAt\": \"2026-03-17T14:00:00.000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "All Adoption Requests  [Admin]",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/adoption/admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["adoption", "admin"],
+              "query": [
+                { "key": "status", "value": "pending", "description": "pending | approved | rejected", "disabled": true }
+              ]
+            },
+            "description": "Returns all adoption requests across all users. **Admin token required.**\n\nEnable the `status` query param to filter by status."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/adoption/admin",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["adoption", "admin"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"_id\": \"64b4d3e5f0a99d003c4h6g42\",\n    \"user\": {\n      \"_id\": \"64b1f2a3c9e77b001a2f3e10\",\n      \"name\": \"Ravi Sharma\",\n      \"email\": \"ravi@example.com\"\n    },\n    \"pet\": {\n      \"_id\": \"64b2a1c3d9e77b001a2f4e20\",\n      \"name\": \"Bruno\",\n      \"species\": \"dog\",\n      \"status\": \"pending\"\n    },\n    \"status\": \"pending\",\n    \"message\": \"I have a large yard...\",\n    \"createdAt\": \"2026-03-17T14:00:00.000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Approve Application  [Admin]",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/adoption/{{adoptionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["adoption", "{{adoptionId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Approves an adoption request. **Admin token required.**\n\n**Cascade effects:**\n- Pet status → `adopted`\n- All other pending requests for same pet → auto-rejected"
+          },
+          "response": [
+            {
+              "name": "200 OK — Approved",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/adoption/{{adoptionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["adoption", "{{adoptionId}}"]
+                },
+                "body": { "mode": "raw", "raw": "{\n  \"status\": \"approved\"\n}" }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"_id\": \"64b4d3e5f0a99d003c4h6g42\",\n  \"user\": { \"name\": \"Ravi Sharma\", \"email\": \"ravi@example.com\" },\n  \"pet\": { \"name\": \"Bruno\", \"status\": \"adopted\" },\n  \"status\": \"approved\",\n  \"createdAt\": \"2026-03-17T14:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reject Application  [Admin]",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/adoption/{{adoptionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["adoption", "{{adoptionId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"rejected\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Rejects an adoption request. **Admin token required.**\n\nIf no other pending requests exist for the pet, pet status reverts to `available`."
+          },
+          "response": [
+            {
+              "name": "200 OK — Rejected",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/adoption/{{adoptionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["adoption", "{{adoptionId}}"]
+                },
+                "body": { "mode": "raw", "raw": "{\n  \"status\": \"rejected\"\n}" }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"_id\": \"64b4d3e5f0a99d003c4h6g42\",\n  \"user\": { \"name\": \"Ravi Sharma\" },\n  \"pet\": { \"name\": \"Bruno\", \"status\": \"available\" },\n  \"status\": \"rejected\"\n}"
+            },
+            {
+              "name": "400 Invalid Status Value",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{baseUrl}}/adoption/{{adoptionId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["adoption", "{{adoptionId}}"]
+                },
+                "body": { "mode": "raw", "raw": "{\n  \"status\": \"maybe\"\n}" }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"message\": \"Status must be approved or rejected\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
